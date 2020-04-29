@@ -5,7 +5,7 @@ android {
     buildToolsVersion "29.0.3"
 
     defaultConfig {
-        applicationId "com.example.myproject"
+        applicationId "com.example.widgets"
         minSdkVersion 16
         targetSdkVersion 29
         versionCode 1
@@ -20,8 +20,20 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-
+    applicationVariants.all { variant ->
+        variant.outputs.all {
+            outputFileName = "${rootProject.name}-${variant.name}-" + {
+                def stdout = new ByteArrayOutputStream()
+                exec {
+                    commandLine 'git', 'describe', '--match=', '--always', '--dirty', '--abbrev=7'
+                    standardOutput = stdout
+                }
+                stdout.toString().trim()
+            }() + ".apk"
+        }
+    }
 }
+
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
